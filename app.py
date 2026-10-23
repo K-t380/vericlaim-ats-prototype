@@ -922,10 +922,10 @@ with tab_wallet:
                     f"Candidate #{candidate_num} ({candidate_name})"
                 )
 
-            if st.session_state.get(
-                f"wallet_request_{candidate_id}",
-                False
-            ):
+            #if st.session_state.get(
+             #   f"wallet_request_{candidate_id}",
+              #  False
+            #):
 
                # st.markdown(
                 #    "**Request Status:** Ready for Wallet Integration"
@@ -949,10 +949,10 @@ with tab_wallet:
               #  "or declines disclosure of the requested credentials."
             #)
 
-            st.markdown(
-                "**4. Credential Validation** — The verifier validates "
-                "the issuer signature and presented credential."
-            )
+          #  st.markdown(
+           #     "**4. Credential Validation** — The verifier validates "
+            #    "the issuer signature and presented credential."
+            #)
 
         with col_w2:
 
