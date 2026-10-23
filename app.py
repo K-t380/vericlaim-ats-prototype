@@ -38,10 +38,10 @@ st.markdown("""
 
 st.title("🎓 VeriClaim AI — Qualification Verification Gateway")
 
-st.markdown(
-    "**Vendor-Neutral Middleware for Resume Qualification Extraction "
-    "& OpenID4VP Digital Credential Verification**"
-)
+#st.markdown(
+ #   "**Vendor-Neutral Middleware for Resume Qualification Extraction "
+  #  "& OpenID4VP Digital Credential Verification**"
+#)
 
 st.caption(
     "VeriClaim AI identifies digital verification channels through "
