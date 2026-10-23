@@ -608,10 +608,10 @@ with tab_overview:
         "pathways and recommended next steps."
     )
 
-    st.caption(
-        "Digital channel availability reflects issuer directory matching, "
-        "not confirmation of the candidate's qualification."
-    )
+   # st.caption(
+    #    "Digital channel availability reflects issuer directory matching, "
+     #   "not confirmation of the candidate's qualification."
+    #)
 
     st.markdown(" ")
 
@@ -866,10 +866,10 @@ with tab_wallet:
         "(OpenID4VP) Request Dispatcher"
     )
 
-    st.caption(
-        "Candidate-controlled digital credential verification "
-        "through compatible identity wallets."
-    )
+  #  st.caption(
+   #     "Candidate-controlled digital credential verification "
+    #    "through compatible identity wallets."
+    #)
 
     if available_count > 0:
 
