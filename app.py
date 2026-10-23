@@ -688,10 +688,10 @@ with tab_overview:
                     f"{pc['recommended_action']}"
                 )
 
-                st.caption(
-                    "The absence of a digital verification channel "
-                    "does not indicate an invalid qualification."
-                )
+               # st.caption(
+                #    "The absence of a digital verification channel "
+                 #   "does not indicate an invalid qualification."
+                #)
 
     st.markdown("### Verification Summary")
 
@@ -728,10 +728,10 @@ with tab_privacy:
         "#### Personal Information Protection"
     )
 
-    st.caption(
-        "Personal identifiers are redacted from the qualification "
-        "processing stream in accordance with data minimization principles."
-    )
+  #  st.caption(
+   #     "Personal identifiers are redacted from the qualification "
+    #    "processing stream in accordance with data minimization principles."
+    #)
 
     col_p1, col_p2 = st.columns(2)
 
@@ -789,10 +789,10 @@ with tab_privacy:
         "✅ Applicant name redaction"
     )
 
-    st.caption(
-        "Automated redaction identifies supported personal data patterns. "
-        "Additional validation is required for unrecognized identifiers."
-    )
+    #st.caption(
+     #   "Automated redaction identifies supported personal data patterns. "
+      #  "Additional validation is required for unrecognized identifiers."
+    #)
 
 
 # TAB 3 — NLU JSON SCHEMA EXTRACTION
@@ -927,27 +927,27 @@ with tab_wallet:
                 False
             ):
 
-                st.markdown(
-                    "**Request Status:** Ready for Wallet Integration"
-                )
+               # st.markdown(
+                #    "**Request Status:** Ready for Wallet Integration"
+               # )
 
-            st.markdown("#### Candidate Experience")
+           # st.markdown("#### Candidate Experience")
 
-            st.markdown(
-                "**1. Wallet Request** — Candidate receives "
-                "a credential presentation request through "
-                "a supported wallet interaction."
-            )
+           # st.markdown(
+            #    "**1. Wallet Request** — Candidate receives "
+             #   "a credential presentation request through "
+              #  "a supported wallet interaction."
+            #)
 
-            st.markdown(
-                "**2. Qualification Review** — Candidate reviews "
-                "the requested qualification information."
-            )
+            #st.markdown(
+             #   "**2. Qualification Review** — Candidate reviews "
+              #  "the requested qualification information."
+            #)
 
-            st.markdown(
-                "**3. Selective Disclosure** — Candidate authorizes "
-                "or declines disclosure of the requested credentials."
-            )
+            #st.markdown(
+             #   "**3. Selective Disclosure** — Candidate authorizes "
+              #  "or declines disclosure of the requested credentials."
+            #)
 
             st.markdown(
                 "**4. Credential Validation** — The verifier validates "
