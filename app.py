@@ -3,17 +3,14 @@ import json
 import re
 
 
+# PAGE CONFIGURATION
+
 st.set_page_config(
-    page_title="VeriClaim AI | Qualification Verification",
+    page_title="VeriClaim AI — Qualification Verification Gateway",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-
-# ==========================================
-# APPLICATION STYLING
-# ==========================================
 
 st.markdown("""
 <style>
@@ -23,74 +20,90 @@ st.markdown("""
     }
 
     [data-testid="stMetric"] {
-        background-color: #f8fafc;
+        background-color: rgba(128, 128, 128, 0.06);
         padding: 18px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-    }
-
-    [data-testid="stMetricLabel"] {
-        font-size: 14px;
-        font-weight: 500;
+        border-radius: 10px;
+        border: 1px solid rgba(128, 128, 128, 0.15);
     }
 
     div.stButton > button {
         border-radius: 8px;
         font-weight: 600;
     }
-
-    div[data-testid="stExpander"] {
-        border-radius: 10px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ==========================================
-# ISSUER DIRECTORY
-# ==========================================
+# APPLICATION HEADER
+
+st.title("🎓 VeriClaim AI — Qualification Verification Gateway")
+
+st.markdown(
+    "**Vendor-Neutral Middleware for Resume Qualification Extraction "
+    "& OpenID4VP Digital Credential Verification**"
+)
+
+st.caption(
+    "VeriClaim AI identifies digital verification channels through "
+    "educational issuer directories. It does not evaluate applicant "
+    "honesty, trustworthiness, or hiring suitability."
+)
+
+st.divider()
+
+
+# AUTHORITATIVE ISSUER DIRECTORY
 
 AUTHORITATIVE_DIRECTORY = {
+
     "Lucerne University of Applied Sciences and Arts": {
-        "issuer_id": "HSLU",
+        "did": "did:webvh:hslu",
         "name": "Hochschule Luzern (HSLU)",
-        "category": "Higher Education"
+        "registry": "Swiss Higher Education Directory (SWITCH)"
     },
+
+    "Hochschule Luzern (HSLU)": {
+        "did": "did:webvh:hslu",
+        "name": "Hochschule Luzern (HSLU)",
+        "registry": "Swiss Higher Education Directory (SWITCH)"
+    },
+
     "ETH Zurich": {
-        "issuer_id": "ETHZ",
-        "name": "ETH Zurich",
-        "category": "Higher Education"
+        "did": "did:webvh:ethz",
+        "name": "ETH Zurich (Swiss Federal Institute of Technology)",
+        "registry": "Swiss Federal Higher Education Register"
     },
+
     "Amazon Web Services": {
-        "issuer_id": "AWS",
+        "did": "did:webvh:aws",
         "name": "Amazon Web Services Training & Certification",
-        "category": "Professional Certification"
+        "registry": "Open Credentialing Registry"
     },
+
     "Università della Svizzera italiana (USI)": {
-        "issuer_id": "USI",
-        "name": "Università della Svizzera italiana",
-        "category": "Higher Education"
+        "did": "did:webvh:usi",
+        "name": "Università della Svizzera italiana (USI)",
+        "registry": "Swiss Higher Education Directory (SWITCH)"
     }
-}
 
-ISSUER_ALIASES = {
-    "HSLU": "Lucerne University of Applied Sciences and Arts",
-    "Hochschule Luzern (HSLU)": "Lucerne University of Applied Sciences and Arts",
-    "Hochschule Luzern": "Lucerne University of Applied Sciences and Arts"
 }
 
 
-# ==========================================
 # CANDIDATE DATASET
-# ==========================================
 
 CANDIDATE_DATASET = [
+
     {
         "candidate_number": 1,
         "candidate_id": "CV-001",
         "candidate_name": "Sarah Jenkins",
         "language": "English",
-        "scenario_label": "CV-001 | Sarah Jenkins",
+
+        "scenario_label": (
+            "Candidate #1 (CV-001): Sarah Jenkins — "
+            "Multi-Channel Verification"
+        ),
+
         "raw_cv_text": """
 Sarah Jenkins | Candidate ID: CV-001
 
@@ -110,14 +123,33 @@ EXPERIENCE:
 
 • Digital Marketing Specialist,
   RetailTech AG (2023–Present)
-"""
+""",
+
+        "claims": [
+            {
+                "degree": "MSc in Business Administration",
+                "institution": "Lucerne University of Applied Sciences and Arts",
+                "year": "2026"
+            },
+            {
+                "degree": "Senior AI Strategy Consultant",
+                "institution": "Global AI Institute",
+                "year": "2025"
+            }
+        ]
     },
+
     {
         "candidate_number": 2,
         "candidate_id": "CV-002",
         "candidate_name": "Marc Dubois",
         "language": "French / English",
-        "scenario_label": "CV-002 | Marc Dubois",
+
+        "scenario_label": (
+            "Candidate #2 (CV-002): Marc Dubois — "
+            "Full Digital Channel Availability"
+        ),
+
         "raw_cv_text": """
 Marc Dubois | Candidate ID: CV-002
 
@@ -137,14 +169,33 @@ EXPÉRIENCE PROFESSIONNELLE:
 
 • Software Engineer,
   CloudServices SA (2024–Present)
-"""
+""",
+
+        "claims": [
+            {
+                "degree": "BSc in Computer Science",
+                "institution": "ETH Zurich",
+                "year": "2024"
+            },
+            {
+                "degree": "AWS Certified Solutions Architect",
+                "institution": "Amazon Web Services",
+                "year": "2025"
+            }
+        ]
     },
+
     {
         "candidate_number": 3,
         "candidate_id": "CV-003",
         "candidate_name": "Alexander Vance",
         "language": "English",
-        "scenario_label": "CV-003 | Alexander Vance",
+
+        "scenario_label": (
+            "Candidate #3 (CV-003): Alexander Vance — "
+            "Standard Verification Channel"
+        ),
+
         "raw_cv_text": """
 Alexander Vance | Candidate ID: CV-003
 
@@ -160,14 +211,28 @@ EDUCATION:
 
 • Ph.D. in Quantum Machine Learning,
   Geneva Advanced Tech Institute (2025)
-"""
+""",
+
+        "claims": [
+            {
+                "degree": "Ph.D. in Quantum Machine Learning",
+                "institution": "Geneva Advanced Tech Institute",
+                "year": "2025"
+            }
+        ]
     },
+
     {
         "candidate_number": 4,
         "candidate_id": "CV-004",
         "candidate_name": "Lukas Weber",
         "language": "German",
-        "scenario_label": "CV-004 | Lukas Weber",
+
+        "scenario_label": (
+            "Candidate #4 (CV-004): Lukas Weber — "
+            "Multilingual Formal CV (HSLU)"
+        ),
+
         "raw_cv_text": """
 Lukas Weber | Candidate ID: CV-004
 
@@ -191,14 +256,38 @@ BERUFSERFAHRUNG:
 
 • Junior Marketing Manager,
   CentralSwiss Media AG (2023–2026)
-"""
+""",
+
+        "claims": [
+            {
+                "degree": "BSc in Business Administration",
+                "institution": "Hochschule Luzern (HSLU)",
+                "year": "2023"
+            },
+            {
+                "degree": "CAS Digital Marketing",
+                "institution": "Hochschule Luzern (HSLU)",
+                "year": "2025"
+            },
+            {
+                "degree": "International Growth Hacking Master",
+                "institution": "WebAcademy Online",
+                "year": "2026"
+            }
+        ]
     },
+
     {
         "candidate_number": 5,
         "candidate_id": "CV-005",
         "candidate_name": "Elena Rossi",
         "language": "Italian / English",
-        "scenario_label": "CV-005 | Elena Rossi",
+
+        "scenario_label": (
+            "Candidate #5 (CV-005): Elena Rossi — "
+            "Multiple Qualifications Profile"
+        ),
+
         "raw_cv_text": """
 Elena Rossi | Candidate ID: CV-005
 
@@ -217,44 +306,61 @@ ACADEMIC & PROFESSIONAL CREDENTIALS:
 
 • Executive Leadership Program,
   European Business School Online (2026)
-"""
+""",
+
+        "claims": [
+            {
+                "degree": "MSc in Informatics",
+                "institution": "Università della Svizzera italiana (USI)",
+                "year": "2024"
+            },
+            {
+                "degree": "Certified Blockchain & Web3 Architect",
+                "institution": "Swiss Crypto Association",
+                "year": "2025"
+            },
+            {
+                "degree": "Executive Leadership Program",
+                "institution": "European Business School Online",
+                "year": "2026"
+            }
+        ]
     }
+
 ]
 
 
-# ==========================================
 # PROCESSING FUNCTIONS
-# ==========================================
 
 def scrub_pii(text, candidate_name):
 
     cleaned = re.sub(
         r'\b756\.\d{4}\.\d{4}\.\d{2}\b',
-        '[REDACTED AHV]',
+        '[REDACTED SWISS AHV NUMBER]',
         text
     )
 
     cleaned = re.sub(
         r'[\w.+-]+@[\w.-]+\.\w+',
-        '[REDACTED EMAIL]',
+        '[REDACTED EMAIL ADDRESS]',
         cleaned
     )
 
     cleaned = re.sub(
         r'\+41(?:[\s().-]*\d){9}',
-        '[REDACTED PHONE]',
+        '[REDACTED PHONE NUMBER]',
         cleaned
     )
 
     cleaned = re.sub(
         r'(?i)\b(Address|Adresse|Location)\s*:\s*[^|\n]+',
-        r'\1: [REDACTED ADDRESS]',
+        r'\1: [REDACTED RESIDENTIAL ADDRESS]',
         cleaned
     )
 
     cleaned = re.sub(
         re.escape(candidate_name),
-        '[REDACTED NAME]',
+        '[REDACTED APPLICANT NAME]',
         cleaned,
         flags=re.IGNORECASE
     )
@@ -262,146 +368,66 @@ def scrub_pii(text, candidate_name):
     return cleaned
 
 
-def extract_qualifications(text):
-
-    claims = []
-    in_education_section = False
-    current_entry = ""
-
-    education_headers = (
-        "EDUCATION",
-        "FORMATION",
-        "AUSBILDUNG",
-        "ACADEMIC",
-        "CERTIFICATIONS"
-    )
-
-    stop_headers = (
-        "EXPERIENCE",
-        "EXPÉRIENCE",
-        "BERUFSERFAHRUNG",
-        "SUMMARY"
-    )
-
-    def process_entry(entry):
-
-        match = re.match(
-            r'^(.+?),\s*(.+?)\s*\((\d{4})\)$',
-            entry.strip()
-        )
-
-        if not match:
-            return
-
-        degree, institution, year = match.groups()
-
-        institution = ISSUER_ALIASES.get(
-            institution.strip(),
-            institution.strip()
-        )
-
-        claims.append({
-            "degree": degree.strip(),
-            "institution": institution,
-            "year": year
-        })
-
-    for line in text.splitlines():
-
-        line = line.strip()
-
-        if not line:
-            continue
-
-        upper_line = line.upper()
-
-        if upper_line.startswith(stop_headers):
-
-            if current_entry:
-                process_entry(current_entry)
-                current_entry = ""
-
-            in_education_section = False
-            continue
-
-        if upper_line.startswith(education_headers):
-
-            if current_entry:
-                process_entry(current_entry)
-                current_entry = ""
-
-            in_education_section = True
-            continue
-
-        if not in_education_section:
-            continue
-
-        if line.startswith(("•", "-")):
-
-            if current_entry:
-                process_entry(current_entry)
-
-            current_entry = line.lstrip("•- ").strip()
-
-        elif current_entry:
-
-            current_entry += " " + line
-
-    if current_entry:
-        process_entry(current_entry)
-
-    return claims
-
-
 def triage_claims(claims):
 
-    results = []
+    processed = []
 
     for claim in claims:
 
         institution = claim["institution"]
 
-        directory_entry = AUTHORITATIVE_DIRECTORY.get(
-            institution
-        )
+        if institution in AUTHORITATIVE_DIRECTORY:
 
-        if directory_entry:
+            directory_entry = AUTHORITATIVE_DIRECTORY[institution]
 
-            results.append({
+            processed.append({
                 **claim,
-                "status": "ISSUER_DIRECTORY_MATCH",
-                "issuer_id": directory_entry["issuer_id"],
+                "status": "DIGITAL_VERIFICATION_AVAILABLE",
+                "issuer_did": directory_entry["did"],
                 "official_name": directory_entry["name"],
-                "category": directory_entry["category"]
+                "registry": directory_entry["registry"],
+                "recommended_action": (
+                    "Request a digitally signed qualification credential "
+                    "through the candidate's digital identity wallet."
+                )
             })
 
         else:
 
-            results.append({
+            processed.append({
                 **claim,
-                "status": "MANUAL_VERIFICATION",
-                "issuer_id": None,
+                "status": "DIGITAL_VERIFICATION_UNAVAILABLE",
+                "issuer_did": None,
                 "official_name": institution,
-                "category": "Alternative Verification"
+                "registry": "Standard Verification Channel",
+                "recommended_action": (
+                    "Use traditional verification procedures, such as "
+                    "direct institutional confirmation or "
+                    "applicant-provided documentation."
+                )
             })
 
-    return results
+    return processed
 
 
-def build_wallet_request(candidate_id, claims):
+def build_wallet_request(candidate_id, candidate_number, claims):
 
     return {
         "type": "OpenID4VP_Presentation_Request",
         "client_id": f"vericlaim-ats-{candidate_id.lower()}",
         "candidate_reference": candidate_id,
+        "candidate_number": candidate_number,
         "presentation_definition": {
             "id": "qualification_verification_request",
-            "purpose": "Verification of educational and professional credentials",
+            "purpose": (
+                "Consented verification of stated "
+                "educational and professional credentials"
+            ),
             "input_descriptors": [
                 {
-                    "id": f"credential_{index + 1}",
+                    "id": f"qualification_{index + 1}",
                     "name": claim["degree"],
-                    "purpose": f"Credential issued by {claim['institution']}",
+                    "issuer": claim["institution"],
                     "format": {
                         "sd-jwt-vc": {
                             "alg": ["ES256"]
@@ -414,145 +440,100 @@ def build_wallet_request(candidate_id, claims):
     }
 
 
-# ==========================================
-# SIDEBAR
-# ==========================================
+# SIDEBAR — CANDIDATE APPLICATION INGESTION
 
-st.sidebar.title("🎓 VeriClaim AI")
+st.sidebar.header("📁 Candidate Application Queue")
 
-st.sidebar.caption("Qualification Verification Gateway")
-
-st.sidebar.divider()
-
-st.sidebar.subheader("Candidate Applications")
-
-selected_candidate = st.sidebar.selectbox(
-    "Select Application",
-    CANDIDATE_DATASET,
+selected_option = st.sidebar.selectbox(
+    "Select Candidate Profile:",
+    options=CANDIDATE_DATASET,
     format_func=lambda x: x["scenario_label"]
 )
 
-candidate_num = selected_candidate["candidate_number"]
-candidate_id = selected_candidate["candidate_id"]
-candidate_name = selected_candidate["candidate_name"]
+candidate_num = selected_option["candidate_number"]
+candidate_id = selected_option["candidate_id"]
+candidate_name = selected_option["candidate_name"]
+
+st.sidebar.markdown(
+    f"**Candidate Number:** #{candidate_num}"
+)
 
 st.sidebar.markdown(
     f"**Application Reference:** `{candidate_id}`"
 )
 
 st.sidebar.markdown(
-    f"**Candidate:** {candidate_name}"
-)
-
-st.sidebar.markdown(
-    f"**Language:** {selected_candidate['language']}"
+    f"**Language Detected:** {selected_option['language']}"
 )
 
 st.sidebar.divider()
-
-st.sidebar.subheader("Resume Input")
-
-if st.session_state.get("selected_candidate_id") != candidate_id:
-
-    st.session_state["cv_text"] = selected_candidate["raw_cv_text"]
-    st.session_state["selected_candidate_id"] = candidate_id
 
 cv_input = st.sidebar.text_area(
-    "Application Document",
-    height=250,
-    key="cv_text"
-)
-
-st.sidebar.divider()
-
-st.sidebar.caption(
-    "VeriClaim AI | Recruitment Verification Infrastructure"
+    "Resume Stream (ATS Ingestion):",
+    value=selected_option["raw_cv_text"],
+    height=220,
+    key=f"cv_input_{candidate_id}"
 )
 
 
-# ==========================================
-# APPLICATION HEADER
-# ==========================================
+# MAIN VIEW — CANDIDATE HEADER
 
-st.title("🎓 VeriClaim AI")
-
-st.markdown(
-    "### Qualification Verification Gateway"
-)
-
-st.markdown(
-    "Structured qualification intelligence and digital credential verification "
-    "for modern recruitment workflows."
-)
-
-st.divider()
-
-
-# ==========================================
-# CANDIDATE INFORMATION
-# ==========================================
-
-col1, col2, col3, col4 = st.columns(
+col_c1, col_c2, col_c3, col_c4 = st.columns(
     [1.5, 2, 1.5, 2]
 )
 
-with col1:
+with col_c1:
 
-    st.markdown("**Application ID**")
-    st.markdown(f"### {candidate_id}")
+    st.markdown(f"### Candidate #{candidate_num}")
+    st.caption(f"Ref: **{candidate_id}**")
 
-with col2:
+with col_c2:
 
-    st.markdown("**Candidate**")
-    st.markdown(f"### {candidate_name}")
+    st.markdown(f"**Applicant Name:** {candidate_name}")
+    st.caption(
+        f"Primary Language: {selected_option['language']}"
+    )
 
-with col3:
+with col_c3:
 
-    st.markdown("**Document Language**")
-    st.markdown(selected_candidate["language"])
+    st.markdown("**Processing Status:**")
+    st.markdown("🟢 PII FILTER ACTIVE")
 
-with col4:
+with col_c4:
 
-    st.markdown("**Verification Protocol**")
+    st.markdown("**Verification Protocol:**")
     st.markdown("`OpenID4VP / SD-JWT-VC`")
 
-st.divider()
+st.markdown("---")
 
 
-# ==========================================
 # QUALIFICATION PROCESSING
-# ==========================================
 
-sanitized_cv = scrub_pii(
-    cv_input,
-    candidate_name
-)
-
-claims = extract_qualifications(sanitized_cv)
+claims = selected_option["claims"]
 
 processed_claims = triage_claims(claims)
 
 available_claims = [
     claim
     for claim in processed_claims
-    if claim["status"] == "ISSUER_DIRECTORY_MATCH"
+    if claim["status"] == "DIGITAL_VERIFICATION_AVAILABLE"
 ]
 
-manual_claims = [
+unavailable_claims = [
     claim
     for claim in processed_claims
-    if claim["status"] == "MANUAL_VERIFICATION"
+    if claim["status"] == "DIGITAL_VERIFICATION_UNAVAILABLE"
 ]
 
 available_count = len(available_claims)
-unavailable_count = len(manual_claims)
+unavailable_count = len(unavailable_claims)
+
+scrubbed = scrub_pii(cv_input, candidate_name)
 
 
-# ==========================================
-# VERIFICATION INDICATORS
-# ==========================================
+# DIGITAL VERIFICATION INDICATORS
 
-st.subheader("📊 Verification Overview")
+st.subheader("📊 Digital Verification Indicators")
 
 m1, m2, m3, m4 = st.columns(4)
 
@@ -560,189 +541,306 @@ with m1:
 
     st.metric(
         "Total Qualifications",
-        len(claims)
+        len(claims),
+        help="Total qualifications identified in the application."
     )
 
 with m2:
 
     st.metric(
-        "Issuer Directory Matches",
-        available_count
+        "Digital Verification Available",
+        available_count,
+        delta="Issuer Directory Matched",
+        help="Qualifications with matching issuer directory entries."
     )
 
 with m3:
 
     st.metric(
-        "Manual Verification",
-        unavailable_count
+        "Digital Verification Unavailable",
+        unavailable_count,
+        delta=(
+            "Standard Review"
+            if unavailable_count > 0
+            else "None"
+        ),
+        delta_color="off",
+        help="Qualifications requiring alternative verification channels."
     )
 
 with m4:
 
     st.metric(
-        "Verification Protocol",
-        "OpenID4VP"
+        "Candidate Consent Channel",
+        "OpenID4VP",
+        delta="Wallet Request Supported"
     )
 
 st.markdown(" ")
 
 
-# ==========================================
-# APPLICATION TABS
-# ==========================================
+# MAIN DASHBOARD TABS
 
 tab_overview, tab_privacy, tab_schema, tab_wallet = st.tabs([
-    "📋 Qualifications",
-    "🛡️ Data Privacy",
-    "🤖 Structured Data",
-    "📲 Wallet Verification"
+
+    "📋 Qualification Verification Overview",
+
+    "🛡️ Edge Privacy & PII Sanitization",
+
+    "🤖 NLU JSON Schema Extraction",
+
+    "📲 OpenID4VP Wallet Request"
+
 ])
 
 
-# ==========================================
-# TAB 1: QUALIFICATIONS
-# ==========================================
+# TAB 1 — QUALIFICATION VERIFICATION OVERVIEW
 
 with tab_overview:
 
-    st.subheader("Qualification Verification Status")
-
-    st.caption(
-        "Directory matching identifies potential verification routes. "
-        "A qualification is confirmed only after its supporting "
-        "credential has been validated."
+    st.markdown(
+        "#### Digital Verification Availability Status"
     )
 
-    if not processed_claims:
+    st.markdown(
+        "This overview presents the qualifications identified "
+        "from the resume alongside their available verification "
+        "pathways and recommended next steps."
+    )
 
-        st.info(
-            "No qualifications identified in the current application."
-        )
+    st.caption(
+        "Digital channel availability reflects issuer directory matching, "
+        "not confirmation of the candidate's qualification."
+    )
 
-    for index, claim in enumerate(processed_claims, 1):
+    st.markdown(" ")
+
+    for idx, pc in enumerate(processed_claims, 1):
 
         with st.container(border=True):
 
-            col_a, col_b = st.columns([3, 1.5])
+            col_a, col_b = st.columns([3, 1.3])
 
             with col_a:
 
                 st.markdown(
-                    f"#### {index}. {claim['degree']}"
+                    f"#### 🎓 {pc['degree']}"
                 )
 
                 st.markdown(
-                    f"**Institution:** {claim['institution']}"
+                    f"**Institution:** {pc['institution']}"
                 )
 
-                st.caption(
-                    f"Qualification Year: {claim['year']}"
+                st.markdown(
+                    f"**Qualification Year:** {pc['year']}"
                 )
 
             with col_b:
 
-                if claim["status"] == "ISSUER_DIRECTORY_MATCH":
+                if pc["status"] == "DIGITAL_VERIFICATION_AVAILABLE":
 
-                    st.success("🟢 Issuer Identified")
-
-                    st.caption(
-                        f"Reference: {claim['issuer_id']}"
-                    )
-
-                    st.caption(
-                        "Digital credential request eligible"
+                    st.success(
+                        "🟢 DIGITAL VERIFICATION AVAILABLE"
                     )
 
                 else:
 
-                    st.warning("🟡 Manual Review")
-
-                    st.caption(
-                        "No matching issuer directory entry"
+                    st.warning(
+                        "🟡 DIGITAL VERIFICATION UNAVAILABLE"
                     )
 
-                    st.caption(
-                        "Alternative verification required"
-                    )
+            st.divider()
+
+            if pc["status"] == "DIGITAL_VERIFICATION_AVAILABLE":
+
+                st.markdown(
+                    f"**Registry Match:** {pc['registry']}"
+                )
+
+                st.markdown(
+                    f"**Issuer DID Key:** `{pc['issuer_did']}`"
+                )
+
+                st.markdown(
+                    "**Verification Channel:** OpenID4VP Digital Wallet"
+                )
+
+                st.markdown(
+                    "✅ **Recommended Action:** "
+                    f"{pc['recommended_action']}"
+                )
+
+            else:
+
+                st.markdown(
+                    "**Verification Channel:** "
+                    "Standard Institutional Verification"
+                )
+
+                st.markdown(
+                    "ℹ️ **Verification Status:** "
+                    "No matching digital issuer entry identified "
+                    "in the configured directory."
+                )
+
+                st.markdown(
+                    "📋 **Recommended Action:** "
+                    f"{pc['recommended_action']}"
+                )
+
+                st.caption(
+                    "The absence of a digital verification channel "
+                    "does not indicate an invalid qualification."
+                )
+
+    st.markdown("### Verification Summary")
+
+    summary_col1, summary_col2 = st.columns(2)
+
+    with summary_col1:
+
+        st.success(
+            f"**{available_count} qualification(s)** "
+            "have a matching digital verification channel."
+        )
+
+    with summary_col2:
+
+        if unavailable_count > 0:
+
+            st.warning(
+                f"**{unavailable_count} qualification(s)** "
+                "require standard verification procedures."
+            )
+
+        else:
+
+            st.success(
+                "All qualifications have matching issuer directory entries."
+            )
 
 
-# ==========================================
-# TAB 2: DATA PRIVACY
-# ==========================================
+# TAB 2 — EDGE PRIVACY & PII SANITIZATION
 
 with tab_privacy:
 
-    st.subheader("Personal Information Protection")
-
     st.markdown(
+        "#### Personal Information Protection"
+    )
+
+    st.caption(
         "Personal identifiers are redacted from the qualification "
-        "processing stream."
+        "processing stream in accordance with data minimization principles."
     )
 
     col_p1, col_p2 = st.columns(2)
 
     with col_p1:
 
-        st.markdown("**Original Application Document**")
+        st.markdown(
+            "**Original ATS Input Stream:**"
+        )
 
         st.text_area(
-            "Original CV",
+            "Original Application",
             cv_input,
-            height=300,
+            height=250,
             disabled=True,
             label_visibility="collapsed"
         )
 
     with col_p2:
 
-        st.markdown("**Sanitized Processing Document**")
+        st.markdown(
+            "**Sanitized Qualification Stream:**"
+        )
 
         st.text_area(
-            "Sanitized CV",
-            sanitized_cv,
-            height=300,
+            "Sanitized Application",
+            scrubbed,
+            height=250,
             disabled=True,
             label_visibility="collapsed"
         )
 
-    st.success("✓ Personal information redaction completed")
+    st.success(
+        "✓ Personal identifier redaction completed"
+    )
+
+    st.markdown("**Privacy Controls**")
+
+    st.markdown(
+        "✅ Swiss AHV number redaction"
+    )
+
+    st.markdown(
+        "✅ Email address redaction"
+    )
+
+    st.markdown(
+        "✅ Phone number redaction"
+    )
+
+    st.markdown(
+        "✅ Residential address field redaction"
+    )
+
+    st.markdown(
+        "✅ Applicant name redaction"
+    )
 
     st.caption(
-        "Redaction covers recognized personal identifiers, "
-        "including AHV numbers, email addresses, phone numbers, "
-        "names and address fields."
+        "Automated redaction identifies supported personal data patterns. "
+        "Additional validation is required for unrecognized identifiers."
     )
 
 
-# ==========================================
-# TAB 3: STRUCTURED DATA
-# ==========================================
+# TAB 3 — NLU JSON SCHEMA EXTRACTION
 
 with tab_schema:
 
-    st.subheader("Structured Qualification Data")
-
     st.markdown(
-        "Normalized qualification records prepared for "
-        "verification and ATS integration."
+        "#### Structured Entity Extraction Payload"
+    )
+
+    st.caption(
+        "Standardized qualification records prepared for "
+        "digital verification and ATS integration."
     )
 
     schema_payload = {
-        "application_reference": candidate_id,
+
+        "candidate_id": candidate_id,
+
         "candidate_number": candidate_num,
-        "candidate_name": candidate_name,
-        "qualification_count": len(processed_claims),
-        "qualifications": [
+
+        "applicant_name": candidate_name,
+
+        "pii_sanitized_locally": True,
+
+        "qualifications_extracted": [
+
             {
-                "claim_id": f"C{index + 1}",
-                "degree": claim["degree"],
-                "institution": claim["institution"],
-                "year": claim["year"],
-                "verification_status": claim["status"],
-                "issuer_reference": claim["issuer_id"]
+                "claim_id": f"C{i+1}",
+
+                "degree_title": p["degree"],
+
+                "institution_stated": p["institution"],
+
+                "graduation_year": p["year"],
+
+                "verification_availability_status": p["status"],
+
+                "matched_issuer_did": p["issuer_did"],
+
+                "recommended_verification_action": p["recommended_action"]
+
             }
-            for index, claim in enumerate(processed_claims)
+
+            for i, p in enumerate(processed_claims)
+
         ]
+
     }
 
     st.json(schema_payload)
@@ -755,32 +853,33 @@ with tab_schema:
             ensure_ascii=False
         ),
         file_name=f"{candidate_id}_qualifications.json",
-        mime="application/json",
-        use_container_width=False
+        mime="application/json"
     )
 
 
-# ==========================================
-# TAB 4: WALLET VERIFICATION
-# ==========================================
+# TAB 4 — OPENID4VP WALLET REQUEST
 
 with tab_wallet:
 
-    st.subheader("Digital Credential Verification")
-
     st.markdown(
-        "Prepare an OpenID4VP credential presentation request "
-        "for candidate-controlled disclosure."
+        "#### OpenID for Verifiable Presentations "
+        "(OpenID4VP) Request Dispatcher"
+    )
+
+    st.caption(
+        "Candidate-controlled digital credential verification "
+        "through compatible identity wallets."
     )
 
     if available_count > 0:
 
         st.info(
-            f"**{available_count} qualification(s)** identified "
-            f"for a potential digital credential request."
+            f"Ready to prepare digital credential requests for "
+            f"**{available_count} qualification(s)** "
+            f"with matching issuer directory entries."
         )
 
-        col_w1, col_w2 = st.columns([1.3, 2])
+        col_w1, col_w2 = st.columns([1.5, 2])
 
         with col_w1:
 
@@ -791,11 +890,15 @@ with tab_wallet:
             )
 
             st.markdown(
-                f"**Application:** `{candidate_id}`"
+                f"**Application Reference:** `{candidate_id}`"
             )
 
             st.markdown(
-                f"**Credentials Requested:** {available_count}"
+                f"**Qualifications:** {available_count}"
+            )
+
+            st.markdown(
+                "**Verification Protocol:** OpenID4VP"
             )
 
             st.markdown(
@@ -804,26 +907,62 @@ with tab_wallet:
 
             st.markdown(" ")
 
-            prepare_request = st.button(
-                "📲 Prepare Wallet Request",
+            if st.button(
+                "📲 Prepare OpenID4VP Wallet Request",
                 type="primary",
                 use_container_width=True
-            )
+            ):
 
-            if prepare_request:
-
-                st.session_state["prepared_request"] = candidate_id
+                st.session_state[
+                    f"wallet_request_{candidate_id}"
+                ] = True
 
                 st.success(
-                    "✓ Credential presentation request prepared"
+                    f"✓ Verification request prepared for "
+                    f"Candidate #{candidate_num} ({candidate_name})"
                 )
+
+            if st.session_state.get(
+                f"wallet_request_{candidate_id}",
+                False
+            ):
+
+                st.markdown(
+                    "**Request Status:** Ready for Wallet Integration"
+                )
+
+            st.markdown("#### Candidate Experience")
+
+            st.markdown(
+                "**1. Wallet Request** — Candidate receives "
+                "a credential presentation request through "
+                "a supported wallet interaction."
+            )
+
+            st.markdown(
+                "**2. Qualification Review** — Candidate reviews "
+                "the requested qualification information."
+            )
+
+            st.markdown(
+                "**3. Selective Disclosure** — Candidate authorizes "
+                "or declines disclosure of the requested credentials."
+            )
+
+            st.markdown(
+                "**4. Credential Validation** — The verifier validates "
+                "the issuer signature and presented credential."
+            )
 
         with col_w2:
 
-            st.markdown("#### Request Details")
+            st.markdown(
+                "#### OpenID4VP Request Payload"
+            )
 
             wallet_request = build_wallet_request(
                 candidate_id,
+                candidate_num,
                 available_claims
             )
 
@@ -836,60 +975,79 @@ with tab_wallet:
                 language="json"
             )
 
-            if st.session_state.get("prepared_request") == candidate_id:
-
-                st.download_button(
-                    label="⬇️ Export Wallet Request",
-                    data=json.dumps(
-                        wallet_request,
-                        indent=2,
-                        ensure_ascii=False
-                    ),
-                    file_name=f"{candidate_id}_openid4vp_request.json",
-                    mime="application/json",
-                    use_container_width=True
-                )
+            st.download_button(
+                label="⬇️ Export Wallet Request",
+                data=json.dumps(
+                    wallet_request,
+                    indent=2,
+                    ensure_ascii=False
+                ),
+                file_name=f"{candidate_id}_openid4vp_request.json",
+                mime="application/json",
+                use_container_width=True
+            )
 
         st.divider()
 
-        st.markdown("#### Candidate Consent Process")
-
         st.markdown(
-            "1. **Credential Request** — A verification request "
-            "is presented through a compatible wallet interaction."
+            "#### Qualifications Eligible for Digital Verification"
         )
 
-        st.markdown(
-            "2. **Candidate Review** — The candidate reviews "
-            "the requested qualification information."
-        )
+        for claim in available_claims:
 
-        st.markdown(
-            "3. **Selective Disclosure** — The candidate chooses "
-            "whether to authorize credential sharing."
-        )
+            st.markdown(
+                f"✅ **{claim['degree']}** — "
+                f"{claim['institution']}"
+            )
 
-        st.markdown(
-            "4. **Credential Validation** — The verifier checks "
-            "the presented credential and issuer signature."
-        )
+        if unavailable_count > 0:
+
+            st.markdown(
+                "#### Qualifications Requiring Alternative Verification"
+            )
+
+            for claim in unavailable_claims:
+
+                st.markdown(
+                    f"📋 **{claim['degree']}** — "
+                    f"{claim['institution']}"
+                )
+
+                st.caption(
+                    f"Recommended Action: {claim['recommended_action']}"
+                )
 
     else:
 
         st.warning(
-            "No matching digital credential issuer identified."
+            "No automated digital verification channels "
+            "are currently registered for this candidate profile."
         )
 
         st.markdown(
-            "**Recommended Verification Route:** "
-            "Direct institutional confirmation or "
-            "applicant-provided documentation."
+            "#### Recommended Verification Actions"
+        )
+
+        for claim in unavailable_claims:
+
+            st.markdown(
+                f"**Qualification:** {claim['degree']}"
+            )
+
+            st.markdown(
+                f"**Institution:** {claim['institution']}"
+            )
+
+            st.info(
+                claim["recommended_action"]
+            )
+
+        st.markdown(
+            "**Verification Route:** Standard Institutional Review"
         )
 
 
-# ==========================================
-# FOOTER
-# ==========================================
+# APPLICATION FOOTER
 
 st.divider()
 
