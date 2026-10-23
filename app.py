@@ -43,11 +43,11 @@ st.title("🎓 VeriClaim AI — Qualification Verification Gateway")
   #  "& OpenID4VP Digital Credential Verification**"
 #)
 
-st.caption(
-    "VeriClaim AI identifies digital verification channels through "
-    "educational issuer directories. It does not evaluate applicant "
-    "honesty, trustworthiness, or hiring suitability."
-)
+#st.caption(
+    #"VeriClaim AI identifies digital verification channels through "
+    #"educational issuer directories. It does not evaluate applicant "
+    #"honesty, trustworthiness, or hiring suitability."
+#)
 
 st.divider()
 
@@ -602,11 +602,11 @@ with tab_overview:
         "#### Digital Verification Availability Status"
     )
 
-    st.markdown(
-        "This overview presents the qualifications identified "
-        "from the resume alongside their available verification "
-        "pathways and recommended next steps."
-    )
+   # st.markdown(
+    #    "This overview presents the qualifications identified "
+     #   "from the resume alongside their available verification "
+      #  "pathways and recommended next steps."
+    #)
 
    # st.caption(
     #    "Digital channel availability reflects issuer directory matching, "
